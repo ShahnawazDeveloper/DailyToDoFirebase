@@ -46,8 +46,9 @@
     <string name="err_msg_passwords_do_not_match">Passwords do not match.</string>
 
     <string name="err_msg_enter_to_do">Please enter To Do.</string>
+    <string name="err_msg_select_date">Please select date.</string>
 
-    <string name="err_msg_invalid_date">Please select Valid date To Do.</string>
+    <string name="err_msg_invalid_date">Selected date &amp; time must be grater then current date &amp; time</string>
     <string name="err_msg_enter_comment">Please enter comment.</string>
 
     <string name="auth_failed_email_user">Authentication failed, email already in use.</string>

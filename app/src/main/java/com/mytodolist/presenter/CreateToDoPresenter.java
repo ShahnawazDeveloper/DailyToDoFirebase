@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -55,23 +56,25 @@ public class CreateToDoPresenter {
     }
 
     /*validate user input*/
-    private boolean isValid(EditText etTitle) {
+    private boolean isValid(EditText etTitle, AppCompatTextView tvDateTime) {
 
         if (ValidationUtil.validateEmptyEditText(etTitle)) {
-            // TODO: 2019-06-26  change message
             createToDoView.showValidationErrorEmptyTitle();
             return false;
         }
 
         /*if (ValidationUtil.validateEmail(etDescription)) {
-            // TODO: 2019-06-26  change message
             dataTypeUtil.showToast(CreateToDoActivity.this, getString(R.string.err_msg_enter_password));
             ValidationUtil.requestFocus(CreateToDoActivity.this, etDescription);
             return false;
         }*/
 
+        if (tvDateTime.getText().equals("Date & Time")) {
+            createToDoView.showValidationErrorEmptyDate();
+            return false;
+        }
+
         if (calendar.getTime().before(new Date())) {
-            // TODO: 2019-06-26  change message
             createToDoView.showValidationErrorInvalidDate();
             return false;
         }
@@ -141,18 +144,6 @@ public class CreateToDoPresenter {
                                     createToDoView.setToDoData(toDoModel);
                                     calendar.setTimeInMillis(toDoModel.getTime().getSeconds() * 1000);
                                 }
-
-                                /*if (toDoModel != null) {
-                                    etTitle.setText(toDoModel.getTitle());
-                                    etDescription.setText(toDoModel.getDescription());
-                                    tvDateTime.setText(dateFormat.format(new Date(toDoModel.getTime().getSeconds() * 1000L)));
-                                    cbCompleted.setVisibility(View.VISIBLE);
-                                    if (toDoModel.isCompleted()) {
-                                        cbCompleted.setChecked(true);
-                                    } else {
-                                        cbCompleted.setChecked(false);
-                                    }
-                                }*/
                             }
                         } else {
                             Log.e("Err getting documents: ", String.valueOf(task.getException()));
@@ -209,8 +200,8 @@ public class CreateToDoPresenter {
     }
 
 
-    public void createToDo(EditText etTitle, EditText etDesc, CheckBox checkBox) {
-        if (isValid(etTitle)) {
+    public void createToDo(EditText etTitle, EditText etDesc, AppCompatTextView tvDateTime, CheckBox checkBox) {
+        if (isValid(etTitle, tvDateTime)) {
             addToDo(etTitle, etDesc, checkBox);
         }
     }

@@ -8,6 +8,8 @@ public interface CreateToDoView {
 
     void showValidationErrorEmptyTitle();
 
+    void showValidationErrorEmptyDate();
+
     void showValidationErrorInvalidDate();
 
     void setDateTime(String dateTime);

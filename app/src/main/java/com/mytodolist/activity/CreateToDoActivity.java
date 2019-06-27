@@ -72,7 +72,7 @@ public class CreateToDoActivity extends AppCompatActivity implements CreateToDoV
                 onBackPressed();
                 return true;
             case R.id.menu_save:
-                presenter.createToDo(etTitle, etDescription, cbCompleted);
+                presenter.createToDo(etTitle, etDescription,tvDateTime, cbCompleted);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -94,6 +94,11 @@ public class CreateToDoActivity extends AppCompatActivity implements CreateToDoV
     public void showValidationErrorEmptyTitle() {
         dataTypeUtil.showToast(CreateToDoActivity.this, getString(R.string.err_msg_enter_to_do));
         ValidationUtil.requestFocus(CreateToDoActivity.this, etTitle);
+    }
+
+    @Override
+    public void showValidationErrorEmptyDate() {
+        dataTypeUtil.showToast(CreateToDoActivity.this, getString(R.string.err_msg_select_date));
     }
 
     @Override
