@@ -11,6 +11,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.mytodolist.R;
 import com.mytodolist.models.UserModel;
 import com.mytodolist.utility.SharedPreference;
 import com.mytodolist.utility.ValidationUtil;
@@ -34,8 +36,35 @@ public class SignUpPresenter {
 
     public void doRequestForSignUp(EditText etLastName, EditText etFirstName, EditText etEmail, EditText etPassword, EditText etConfirmPassword) {
         if (isValid(etLastName, etFirstName, etEmail, etPassword, etConfirmPassword)) {
-            signUpUser(etLastName, etFirstName, etEmail, etPassword);
+            CheckForExistingUser(etLastName, etFirstName, etEmail, etPassword);
+            //signUpUser(etLastName, etFirstName, etEmail, etPassword);
         }
+    }
+
+
+    private void CheckForExistingUser(EditText etLastName, EditText etFirstName, EditText etEmail, EditText etPassword) {
+        mFirestore.collection("users")
+                .whereEqualTo("email", etEmail.getText().toString().trim())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (!queryDocumentSnapshots.getDocuments().isEmpty() &&
+                                queryDocumentSnapshots.getDocuments().size() > 0) {
+                            signUpView.onSetProgressBarVisibility(View.GONE);
+                            signUpView.signUpFail((String) context.getText(R.string.auth_failed_email_user));
+                        } else {
+                            signUpUser(etLastName, etFirstName, etEmail, etPassword);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        signUpUser(etLastName, etFirstName, etEmail, etPassword);
+                    }
+                });
+
     }
 
     //create user

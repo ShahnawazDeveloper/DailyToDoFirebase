@@ -173,7 +173,7 @@ public class CreateToDoPresenter {
                     desc.getText().toString().trim(),
                     new Timestamp(calendar.getTime()),
                     new Timestamp(new Date()),
-                    isSelected.isSelected()
+                    isSelected.isChecked()
             );
         } else {
             documentReference = mFirestore.collection("todo").document();

@@ -50,4 +50,6 @@
     <string name="err_msg_invalid_date">Please select Valid date To Do.</string>
     <string name="err_msg_enter_comment">Please enter comment.</string>
 
+    <string name="auth_failed_email_user">Authentication failed, email already in use.</string>
+
 </resources>
