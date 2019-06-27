@@ -12,17 +12,20 @@ public class UserModel implements Serializable {
     private String email;
     private String password;
     private Timestamp createdDate;
+    private String fcm_token;
+
 
     public UserModel() {
     }
 
-    public UserModel(String uid, String firstName, String lastName, String email, String password, Timestamp createdDate) {
+    public UserModel(String uid, String firstName, String lastName, String email, String password, String push_token, Timestamp createdDate) {
         this.uid = uid;
         this.firstName = firstName;
         LastName = lastName;
         this.email = email;
         this.password = password;
         this.createdDate = createdDate;
+        this.fcm_token = push_token;
     }
 
     public String getFirstName() {
@@ -71,5 +74,13 @@ public class UserModel implements Serializable {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getFcm_token() {
+        return fcm_token;
+    }
+
+    public void setFcm_token(String fcm_token) {
+        this.fcm_token = fcm_token;
     }
 }

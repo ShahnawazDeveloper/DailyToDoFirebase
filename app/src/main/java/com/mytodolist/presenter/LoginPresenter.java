@@ -6,10 +6,14 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.mytodolist.R;
 import com.mytodolist.models.UserModel;
 import com.mytodolist.utility.SharedPreference;
@@ -23,12 +27,14 @@ public class LoginPresenter {
     private SharedPreference preference;
 
     private Context context;
+    private String token;
 
     public LoginPresenter(Context context, LoginView loginView) {
         this.context = context;
         this.loginView = loginView;
         mFirestore = FirebaseFirestore.getInstance();
         preference = SharedPreference.getInstance();
+        getFCMToken();
     }
 
     public void doLogin(EditText email, EditText pwd) {
@@ -41,11 +47,15 @@ public class LoginPresenter {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                             loginView.onSetProgressBarVisibility(View.GONE);
-
                             if (!queryDocumentSnapshots.getDocuments().isEmpty() &&
                                     queryDocumentSnapshots.getDocuments().size() > 0) {
-                                preference.setUserDetails(queryDocumentSnapshots.getDocuments().get(0).toObject(UserModel.class));
-                                loginView.loginSuccessFully();
+                                UserModel userModel = queryDocumentSnapshots.getDocuments().get(0).toObject(UserModel.class);
+                                if (userModel != null) {
+                                    userModel.setFcm_token(token);
+                                    updateFCMToken(userModel);
+                                    preference.setUserDetails(userModel);
+                                    loginView.loginSuccessFully();
+                                }
                             } else {
                                 loginView.loginFail((String) context.getText(R.string.auth_failed));
                             }
@@ -59,6 +69,10 @@ public class LoginPresenter {
                         }
                     });
         }
+    }
+
+    private void updateFCMToken(UserModel userModel) {
+        mFirestore.collection("users").document(userModel.getUid()).set(userModel);
     }
 
     public void checkForAlreadyLogin() {
@@ -88,5 +102,25 @@ public class LoginPresenter {
 
         loginView.onSetProgressBarVisibility(View.VISIBLE);
         return true;
+    }
+
+
+    private void getFCMToken() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    //Logger.e("getInstanceId failed", task.getException());
+                    return;
+                }
+
+                // Get new Instance ID token
+                if (task.getResult() != null) {
+                    token = task.getResult().getToken();
+                    SharedPreference.getInstance().setStringInPref("FCM_Token", token);
+                    //Logger.e(token);
+                }
+            }
+        });
     }
 }

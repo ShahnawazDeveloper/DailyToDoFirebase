@@ -109,6 +109,12 @@ public class SignUpActivity extends AppCompatActivity implements SignUpView {
     }
 
     @Override
+    public void showValidationErrorInvalidPassword() {
+        dataTypeUtil.showToast(SignUpActivity.this, getString(R.string.minimum_password));
+        ValidationUtil.requestFocus(SignUpActivity.this, etPassword);
+    }
+
+    @Override
     public void showValidationErrorEmptyConfirmPassword() {
         dataTypeUtil.showToast(SignUpActivity.this, getString(R.string.err_msg_enter_confirm_password));
         ValidationUtil.requestFocus(SignUpActivity.this, etConfirmPassword);

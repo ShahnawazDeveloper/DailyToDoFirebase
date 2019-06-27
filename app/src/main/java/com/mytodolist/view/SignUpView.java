@@ -14,6 +14,8 @@ public interface SignUpView {
 
     void showValidationErrorEmptyPassword();
 
+    void showValidationErrorInvalidPassword();
+
     void showValidationErrorEmptyConfirmPassword();
 
     void showValidationErrorConfirmPasswordNotMatch();

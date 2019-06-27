@@ -6,12 +6,16 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.mytodolist.R;
 import com.mytodolist.models.UserModel;
 import com.mytodolist.utility.SharedPreference;
@@ -26,12 +30,14 @@ public class SignUpPresenter {
     private FirebaseFirestore mFirestore;
     private SharedPreference preference;
     private Context context;
+    private String token;
 
     public SignUpPresenter(Context context, SignUpView signUpView) {
         this.context = context;
         this.signUpView = signUpView;
         mFirestore = FirebaseFirestore.getInstance();
         preference = SharedPreference.getInstance();
+        getFCMToken();
     }
 
     public void doRequestForSignUp(EditText etLastName, EditText etFirstName, EditText etEmail, EditText etPassword, EditText etConfirmPassword) {
@@ -76,6 +82,7 @@ public class SignUpPresenter {
                 etLastName.getText().toString().trim(),
                 etEmail.getText().toString().trim(),
                 etPassword.getText().toString().trim(),
+                token,
                 new Timestamp(new Date())
         );
 
@@ -128,10 +135,16 @@ public class SignUpPresenter {
             signUpView.showValidationErrorEmptyPassword();
             return false;
         }
+        if (ValidationUtil.validatePassword(etPassword)) {
+            signUpView.showValidationErrorInvalidPassword();
+            return false;
+        }
+
         if (ValidationUtil.validateEmptyEditText(etConfirmPassword)) {
             signUpView.showValidationErrorEmptyConfirmPassword();
             return false;
         }
+
         if (ValidationUtil.validateConfirmPassword(etPassword, etConfirmPassword)) {
             signUpView.showValidationErrorConfirmPasswordNotMatch();
             return false;
@@ -139,6 +152,25 @@ public class SignUpPresenter {
 
         signUpView.onSetProgressBarVisibility(View.VISIBLE);
         return true;
+    }
+
+    private void getFCMToken() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            @Override
+            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                if (!task.isSuccessful()) {
+                    //Logger.e("getInstanceId failed", task.getException());
+                    return;
+                }
+
+                // Get new Instance ID token
+                if (task.getResult() != null) {
+                     token = task.getResult().getToken();
+                    SharedPreference.getInstance().setStringInPref("FCM_Token", token);
+                    //Logger.e(token);
+                }
+            }
+        });
     }
 
 }

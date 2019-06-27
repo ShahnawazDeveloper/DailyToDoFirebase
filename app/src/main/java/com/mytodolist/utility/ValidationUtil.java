@@ -31,9 +31,9 @@ public class ValidationUtil {
         return !TextUtils.isEmpty(url) && !Patterns.WEB_URL.matcher(url).matches();
     }
 
-    public static boolean validatePassword(AppCompatEditText et_password) {
+    public static boolean validatePassword(EditText et_password) {
         String password = et_password.getText().toString().trim();
-        return (password.isEmpty() || !isValidPassword(password));
+        return (password.isEmpty() || password.length() < 6);
     }
 
     public static boolean validateConfirmPassword(EditText et_password, EditText et_confirm_password) {
